@@ -1,6 +1,6 @@
 class Product < ApplicationRecord
   has_one_attached :image
-  after_commit -> { broadcast_refresh_later_to "products" } #hotwire
+  after_commit -> { broadcast_refresh_later_to "products" } # hotwire
 
   validates :title, :description, :image, presence: true
   validates :price, numericality: { greater_than_or_equal_to: 0.01 }
@@ -15,5 +15,4 @@ class Product < ApplicationRecord
       errors.add(:image, "must be a .gif, .jpeg or .png image file type.")
     end
   end
-  
 end
