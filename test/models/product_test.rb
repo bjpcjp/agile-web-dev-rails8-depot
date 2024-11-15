@@ -2,63 +2,53 @@ require "test_helper"
 
 class ProductTest < ActiveSupport::TestCase
 
-  #fixtures :products 
+  #test "correct product attributes" do 
+  #  p = Product.new
+  #  assert p.invalid?
+  #  assert p.errors[:title].any?
+  #  assert p.errors[:description].any?
+  #  assert p.errors[:price].any?
+  #  assert p.errors[:image].any?
+  #end
 
-  test "correct product attributes" do 
-    p = Product.new
+  test "product pricing must be >0.01" do
+    p = Product.new(title: "tbd", description: "tbd")
+    p.image.attach(io: File.open("test/fixtures/files/lorem.jpg"), filename: "lorem.jpg", content_type: "image/jpeg")
+    
+    p.price = -1.0; assert p.invalid?
+    p.price =  0.0; assert p.invalid?
+    p.price = +1.0; assert p.valid?
+  end
+
+  test "product image type must be gif, jpg or png" do 
+    p = Product.new(title: "tbd", description: "tbd", price: 1.0)
+
+    p.image.attach(io: File.open("test/fixtures/files/lorem.jpg"), filename: "lorem.jpg", content_type: "image/jpeg")
+    assert p.valid?
+    p.image.attach(io: File.open("test/fixtures/files/lorem.png"), filename: "lorem.png", content_type: "image/png")
+    assert p.valid?
+    p.image.attach(io: File.open("test/fixtures/files/lorem.gif"), filename: "lorem.gif", content_type: "image/gif")
+    assert p.valid?
+    p.image.attach(io: File.open("test/fixtures/files/lorem.svg"), filename: "lorem.svg", content_type: "image/svg+html")
     assert p.invalid?
-    assert p.errors[:title].any?
-    assert p.errors[:description].any?
-    assert p.errors[:price].any?
-    assert p.errors[:image].any?
   end
 
+  fixtures :products
 
-  test "product price must be 0.01 or higher" do
-    p = Product.new(
-      title: "test", description: "test")
+  test "product title must be unique" do
+    p = Product.new(title: products(:pragprog).title, description: "na", price: 1.0)
     p.image.attach(
-      io: File.open("test/fixtures/files/lorem.jpg"), 
-      filename: "lorem.jpg",
-      content_type: "image/jpeg")
-
-    p.price = -1; assert p.invalid?
-    assert_equal ["must be greater than or equal to 0.01"], p.errors[:price]
-    p.price = 0; assert p.invalid?
-    assert_equal ["must be greater than or equal to 0.01"], p.errors[:price]
-    p.price = 1; assert p.valid?
-  end
-
-
-  test "product image filetype must be gif, jpeg or png" do 
-    p = Product.new(
-      title: "test", description: "test", price: 1.0)
-
-    p.image.attach(
-      io: File.open("test/fixtures/files/lorem.jpg"), 
-      filename: "lorem.jpg",
-      content_type: "image/jpeg")
-    assert p.valid?, "image/jpeg must be valid"
-
-    p = Product.new(
-      title: "test", description: "test", price: 1.0)
-
-    p.image.attach(
-      io: File.open("test/fixtures/files/lorem.svg"), 
-      filename: "lorem.jpg",
-      content_type: "image/svg+xml")
-    assert_not p.valid?, "image/svg+xml must be invalid"
-  end
-
-
-  test "product is not valid without a unique title" do 
-    p = Product.new(title: products(:pragprog).title, description: "test", price: 1.0)
-    p.image.attach(
-      io: File.open("test/fixtures/files/lorem.jpg"),
-      filename: "lorem.jpg",
-      content_type: "image/jpeg")
-    assert product.invalid?
+      io: File.open("test/fixtures/files/lorem.jpg"), filename: "lorem.jpg", content_type: "image/jpeg")
+    assert p.invalid?
     assert_equal ["has already been taken"], p.errors[:title]
+  end
+
+  test "product title must be unique - avoiding hardcoded ActiveRecord error msg" do
+    p = Product.new(title: products(:pragprog).title, description: "na", price: 1.0)
+    p.image.attach(
+      io: File.open("test/fixtures/files/lorem.jpg"), filename: "lorem.jpg", content_type: "image/jpeg")
+    assert p.invalid?
+    assert_equal [ I18n.translate("errors.messages.taken")], p.errors[:title]
   end
 
 end
