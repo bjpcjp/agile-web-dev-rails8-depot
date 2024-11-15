@@ -16,7 +16,7 @@ p = Product.create(
 
 p.image.attach(
     io: File.open(
-        Rails.root.join('db','images','silicon-wafer-1-4083097415.jpg')),
+        Rails.root.join('db','images','silicon-wafer-1-4083097415.jpg')), 
     filename: 'silicon-wafer-1-4083097415.jpg'
 )
 p.save!

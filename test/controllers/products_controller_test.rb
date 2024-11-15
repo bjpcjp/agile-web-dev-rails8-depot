@@ -18,13 +18,13 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create product" do
     assert_difference("Product.count") do
-      post products_url, params: { 
-        product: { 
+      post products_url, params: {
+        product: {
           description: @product.description,
           image: file_fixture_upload("lorem.jpg", "image.jpeg"), # see book page 101
-          price: @product.price, 
+          price: @product.price,
           title: @title # was @product.title 
-          } 
+          }
         }
     end
 
@@ -42,9 +42,9 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update product" do
-    patch product_url(@product), params: { 
-      product: { 
-        description: @product.description, 
+    patch product_url(@product), params: {
+      product: {
+        description: @product.description,
           image: file_fixture_upload("lorem.jpg", "image.jpeg"), # see book page 101
           price: @product.price, 
           title: @title # was @product.title 
