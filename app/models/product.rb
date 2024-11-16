@@ -1,4 +1,7 @@
 class Product < ApplicationRecord
+  has_many :line_items # book page 122
+  before_destroy :ensure_not_referenced_by_any_line_items
+
   has_one_attached :image
   after_commit -> { broadcast_refresh_later_to "products" } # hotwire
 
@@ -13,6 +16,14 @@ class Product < ApplicationRecord
     acceptable_types = [ "image/gif", "image/jpeg", "image/png" ]
     unless acceptable_types.include?(image.content_type)
       errors.add(:image, "must be a .gif, .jpeg or .png image file type.")
+    end
+  end
+
+  private
+  def ensure_not_referenced_by_any_line_items
+    unless line_items.empty?
+      errors.add(:base,"line items present")
+      throw :abort
     end
   end
 end
